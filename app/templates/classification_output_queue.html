@@ -41,7 +41,7 @@
                 </div>
             <div class="card" style="top: 15%; bottom: 0%;">
                 <a class="dl btn btn-dark" role="button" href="{{ url_for('get_plot', job_id=jobID) }}">Download Plot</a>
-                <a class="dl btn btn-dark" role="button" href="/">Download JSON</a>
+                <a class="dl btn btn-dark" role="button" href="{{ url_for('get_json', job_id=jobID) }}">Download JSON</a>
             </div>
         </div>
     </div>
