@@ -1,32 +1,31 @@
-import requests
 import json
-from flask import url_for
+from config import Configuration
+
+import redis
+from rq import Connection, Queue
 
 
-def fetch(job_id, url=None):
-
+def fetch(job_id):
     """Fetch the wanted JSON data
 
     @param job_id: Id of a job.
-    @param url: URL from which to retrieve the data.
     @return: the desired JSON data or None.
     """
 
+    redis_url = Configuration.REDIS_URL
+    redis_conn = redis.from_url(redis_url)
+    with Connection(redis_conn):
+        q = Queue(name=Configuration.QUEUE)
+        data = {}
+        try:
 
-    if url is None:
-        url = 'http://localhost:5000' + \
-              url_for('classifications_id', job_id=job_id)
+            result = q.fetch_job(job_id).result
+            # transform result in a dictionary
+            for item in result:
+                data[item[0]] = item[1]
+            data = json.dumps(data)
+            return data
 
-    try:
-        request = requests.get(url)
-
-        json_data = request.json()
-
-        data = json.dumps(dict(json_data.get('data')))
-        return data
-
-
-    except Exception as e:
-
-        print(repr(e))
-        return None
+        except:
+            return None
+e
